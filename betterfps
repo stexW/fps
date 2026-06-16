@@ -57,4 +57,4 @@ end
 -- Listen for new objects loaded into the game to optimize them instantly
 Workspace.DescendantAdded:Connect(optimizeObject)
 
-print("FPS Booster: Textures removed and materials simplified successfully.")
+print("FPS Booster: Textures removed and materials simplified successfully...")
